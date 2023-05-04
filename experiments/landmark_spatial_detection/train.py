@@ -77,7 +77,7 @@ def main():
     optimiser = Adam(model.parameters(), lr=args.learning_rate)
     loss = nn.L1Loss()
 
-    logger = PandasPerformanceLogger(args.save_dir / "performance.csv")
+    logger = PandasPerformanceLogger(Path(args.save_dir) / "performance.csv")
 
     print("Beggining training")
     trainer = VGGTrainer(
