@@ -25,7 +25,11 @@ class ModelTrainer(ABC):
         train_fraction: float = 0.75,
         logger: Optional[PerformanceLogger] = None,
     ):
+        self.device = torch.device(
+            "cuda" if torch.cuda.is_available() else "cpu"
+        )
         self.model = model
+        self.model.to(self.device)
         self.dataset = dataset
         self.dataset_train, self.dataset_test = random_split(
             dataset, [train_fraction, 1 - train_fraction]

@@ -5,12 +5,9 @@ import argparse
 print(str(Path(__file__).parents[2]))
 sys.path.insert(0, str(Path(__file__).parents[2]))
 
-import numpy as np
 import torch
 from torch import nn
-from torch.utils.data import DataLoader
 from torch.optim import Adam
-import matplotlib.pyplot as plt
 from src.models.VGGMod import VGGMod
 from src.data.dataset import FrameKeyPointDataset, Rescale, RandomSquareCrop
 from src.utils.ModelTrainer import ModelTrainer
@@ -20,11 +17,11 @@ from src.utils.PerformanceLogger import PandasPerformanceLogger
 class VGGTrainer(ModelTrainer):
     # define how input sample to model
     def output(self, sample):
-        return self.model(sample["img"])
+        return self.model(sample["img"].to(self.device))
 
     # define how to calculate loss
     def calc_loss(self, output, sample) -> torch.Tensor:
-        return self.loss(output, sample["labels"])
+        return self.loss(output, sample["labels"].to(self.device))
 
 
 def main():
@@ -57,12 +54,10 @@ def main():
     )
     args = parser.parse_args()
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
     print("Getting model")
     vgg = torch.hub.load("pytorch/vision:v0.10.0", "vgg19", pretrained=True)
+    print("Customising model")
     model = VGGMod(vgg, 512, 13)
-    model.to(device)
 
     print("Initialising objects")
     dataset = FrameKeyPointDataset(
