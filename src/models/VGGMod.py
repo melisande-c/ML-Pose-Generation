@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from torch import nn
 
 
@@ -8,8 +9,13 @@ class VGGMod(nn.Module):
         self.n_features = n_features
         self.vgg_model = vgg_model
         in_features = self.vgg_model.classifier[-4].out_features
-        self.vgg_model.classifier[-1] = nn.Linear(
-            in_features, (dim**2) * n_features
+        self.vgg_model.classifier[-1] = nn.Sequential(
+            OrderedDict(
+                [
+                    ("fc", nn.Linear(in_features, (64**2) * n_features)),
+                    ("upsample", nn.Upsample((dim, dim))),
+                ]
+            )
         )
 
     def forward(self, x):
