@@ -59,10 +59,12 @@ def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    print("Getting model")
     vgg = torch.hub.load("pytorch/vision:v0.10.0", "vgg19", pretrained=True)
     model = VGGMod(vgg, 512, 13)
     model.to(device)
 
+    print("Initialising objects")
     dataset = FrameKeyPointDataset(
         args.dataset_path, transforms=[Rescale(512), RandomSquareCrop(512)]
     )
@@ -71,6 +73,7 @@ def main():
 
     logger = PandasPerformanceLogger(args.save_dir / "performance.csv")
 
+    print("Beggining training")
     trainer = VGGTrainer(
         model,
         dataset,
