@@ -36,26 +36,37 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "-e", "--epochs", help="Number of Epochs to train for.", default=5
+        "-e",
+        "--epochs",
+        help="Number of Epochs to train for.",
+        default=5,
+        type=int,
     )
     parser.add_argument(
-        "-bs", "--batch_size", help="No. of inputs per batch.", default=32
+        "-bs",
+        "--batch_size",
+        help="No. of inputs per batch.",
+        default=32,
+        type=int,
     )
     parser.add_argument(
         "-lr",
         "--learning_rate",
         help="Learning rate of optimiser.",
         default=0.001,
+        type=float,
     )
     parser.add_argument(
         "-tf",
         "--training_fraction",
         help="Fraction of dataset to use for training.",
+        default=0.75,
+        type=float,
     )
     args = parser.parse_args()
 
     print("Getting model")
-    vgg = torch.hub.load("pytorch/vision:v0.10.0", "vgg19", pretrained=True)
+    vgg = torch.hub.load("pytorch/vision:v0.10.0", "vgg11", pretrained=True)
     print("Customising model")
     model = VGGMod(vgg, 512, 13)
 
