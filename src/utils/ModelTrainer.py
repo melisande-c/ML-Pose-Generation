@@ -44,8 +44,8 @@ class ModelTrainer(ABC):
         self.optimiser = optimiser
         self.loss = loss
         self.savedir = pathlib.Path(savedir)
-        if logger is not None:
-            self.logger = PerformanceLogger()
+        if logger is None:
+            self.logger = PerformanceLogger(self.savedir / "Performance.log")
         else:
             self.logger = logger
 
