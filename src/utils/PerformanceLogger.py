@@ -12,7 +12,7 @@ class PerformanceLogger:
             name = f"Performance: {name}"
         else:
             name = "Performance"
-        self.logger = logging.Logger(name, logging.INFO)
+        self.logger = logging.getLogger(name)
 
     def log_performance(
         self, epoch: int, mode: int, loss: float, accuracy: float
@@ -26,8 +26,8 @@ class PerformanceLogger:
 
 
 class PandasPerformanceLogger(PerformanceLogger):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, filename: os.PathLike, name: Optional[str] = None):
+        super().__init__(filename, name)
         if self.filename.suffix != ".csv":
             self.df_filename = self.df_filename.with_suffix(",csv")
 
