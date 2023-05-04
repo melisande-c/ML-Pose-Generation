@@ -36,10 +36,10 @@ class ModelTrainer(ABC):
             dataset, [train_fraction, 1 - train_fraction]
         )
         self.dataloader_train = DataLoader(
-            self.dataloader_train, batch_size, shuffle=True
+            self.dataset_train, batch_size, shuffle=True
         )
         self.dataloader_test = DataLoader(
-            self.dataloader_test, batch_size, shuffle=True
+            self.dataset_test, batch_size, shuffle=True
         )
         self.optimiser = optimiser
         self.loss = loss
