@@ -87,7 +87,7 @@ def main():
         loss,
         args.save_dir,
         args.batch_size,
-        train_fraction=args.train_fraction,
+        train_fraction=args.training_fraction,
         logger=logger,
     )
 
