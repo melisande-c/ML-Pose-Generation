@@ -2,6 +2,7 @@ import sys
 import os
 from pathlib import Path
 import argparse
+import logging
 
 print(str(Path(__file__).parents[2]))
 sys.path.insert(0, str(Path(__file__).parents[2]))
@@ -23,6 +24,9 @@ class VGGTrainer(ModelTrainer):
     # define how to calculate loss
     def calc_loss(self, output, sample) -> torch.Tensor:
         return self.loss(output, sample["labels"].to(self.device))
+
+
+logger = logging.getLogger("TrainLogger")
 
 
 def main():
@@ -71,21 +75,23 @@ def main():
         if not os.path.isdir(parent):
             os.mkdir(parent)
 
-    print("Getting model")
+    logger.info("Getting model")
     vgg = torch.hub.load("pytorch/vision:v0.10.0", "vgg11", pretrained=True)
     print("Customising model")
     model = VGGMod(vgg, 512, 13)
 
-    print("Initialising objects")
+    logger.info("Initialising objects")
     dataset = FrameKeyPointDataset(
         args.dataset_path, transforms=[Rescale(512), RandomSquareCrop(512)]
     )
     optimiser = Adam(model.parameters(), lr=args.learning_rate)
     loss = nn.L1Loss()
 
-    logger = PandasPerformanceLogger(args.save_dir / "performance.csv")
+    performance_logger = PandasPerformanceLogger(
+        args.save_dir / "performance.csv"
+    )
 
-    print("Beggining training")
+    logger.info("Beggining training")
     trainer = VGGTrainer(
         model,
         dataset,
@@ -94,7 +100,7 @@ def main():
         args.save_dir,
         args.batch_size,
         train_fraction=args.training_fraction,
-        logger=logger,
+        logger=performance_logger,
     )
 
     trainer.run(args.epochs)
