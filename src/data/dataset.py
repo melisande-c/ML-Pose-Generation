@@ -120,8 +120,8 @@ class RandomSquareCrop:
         self.size = size
 
     def __call__(self, img, x, y):
-        idiff = max(0, img.size[1] - self.size)
-        jdiff = max(0, img.size[0] - self.size)
+        idiff = max(0, img.size[1] - self.size - 1)
+        jdiff = max(0, img.size[0] - self.size - 1)
 
         if idiff != 0:
             i = np.random.randint(0, idiff)
