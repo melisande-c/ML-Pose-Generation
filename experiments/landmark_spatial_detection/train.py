@@ -86,7 +86,7 @@ def main():
     logger.info("Getting model")
     vgg = torch.hub.load("pytorch/vision:v0.10.0", "vgg11", pretrained=True)
     logger.info("Customising model")
-    model = VGGMod(vgg, 512, 13)
+    model = VGGMod(vgg, 224, 13)
 
     logger.info("Initialising objects")
     dataset = FrameKeyPointDataset(
