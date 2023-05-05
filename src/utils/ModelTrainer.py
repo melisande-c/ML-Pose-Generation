@@ -13,7 +13,7 @@ from .PerformanceLogger import PerformanceLogger
 if TYPE_CHECKING:
     Loss = nn.modules.loss._Loss
 
-train_logger = logging.getLogger("TrainLogger")
+info_logger = logging.getLogger(__name__)
 
 
 class ModelTrainer(ABC):
@@ -31,7 +31,7 @@ class ModelTrainer(ABC):
         self.device = torch.device(
             "cuda" if torch.cuda.is_available() else "cpu"
         )
-        train_logger.info(f"Using device: {self.device}")
+        info_logger.info(f"Using device: {self.device}")
         self.model = model
         self.model.to(self.device)
         self.dataset = dataset
@@ -89,7 +89,7 @@ class ModelTrainer(ABC):
     def run(self, epochs: int):
         for epoch in range(epochs):
             self.epoch += 1
-            train_logger.info(f"--- Epoch {self.epoch}")
+            info_logger.info(f"--- Epoch {self.epoch}")
             self.train()
             self.logger.log_performance(
                 epoch, "train", self.train_loss.item(), None

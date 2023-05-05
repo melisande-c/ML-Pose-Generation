@@ -25,7 +25,14 @@ class VGGTrainer(ModelTrainer):
         return self.loss(output, sample["labels"].to(self.device))
 
 
-logger = logging.getLogger("TrainLogger")
+logger = logging.getLogger(
+    logging.basicConfig(
+        format="%(asctime)-10s  %(name)-40s  %(levelname)-8s: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        level=logging.INFO,
+        force=True,
+    )
+)
 
 
 def main():
