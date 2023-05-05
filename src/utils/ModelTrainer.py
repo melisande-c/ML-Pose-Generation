@@ -2,15 +2,18 @@ from __future__ import annotations
 import os
 import pathlib
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Optional
+import logging
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, Dataset, random_split
 from torch.optim import Optimizer
-from typing import TYPE_CHECKING, Optional
 from .PerformanceLogger import PerformanceLogger
 
 if TYPE_CHECKING:
     Loss = nn.modules.loss._Loss
+
+train_logger = logging.getLogger("TrainLogger")
 
 
 class ModelTrainer(ABC):
@@ -28,7 +31,7 @@ class ModelTrainer(ABC):
         self.device = torch.device(
             "cuda" if torch.cuda.is_available() else "cpu"
         )
-        print(f"Using device: {self.device}")
+        train_logger.info(f"Using device: {self.device}")
         self.model = model
         self.model.to(self.device)
         self.dataset = dataset
@@ -86,6 +89,7 @@ class ModelTrainer(ABC):
     def run(self, epochs: int):
         for epoch in range(epochs):
             self.epoch += 1
+            train_logger.info(f"--- Epoch {self.epoch}")
             self.train()
             self.logger.log_performance(
                 epoch, "train", self.train_loss.item(), None

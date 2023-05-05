@@ -4,7 +4,6 @@ from pathlib import Path
 import argparse
 import logging
 
-print(str(Path(__file__).parents[2]))
 sys.path.insert(0, str(Path(__file__).parents[2]))
 
 import torch
@@ -77,7 +76,7 @@ def main():
 
     logger.info("Getting model")
     vgg = torch.hub.load("pytorch/vision:v0.10.0", "vgg11", pretrained=True)
-    print("Customising model")
+    logger.info("Customising model")
     model = VGGMod(vgg, 512, 13)
 
     logger.info("Initialising objects")
