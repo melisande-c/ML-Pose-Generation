@@ -67,7 +67,7 @@ def main():
     args = parser.parse_args()
 
     args.save_dir = Path(args.save_dir)
-    for parent in args.savedir.parents[::-1]:
+    for parent in args.save_dir.parents[::-1]:
         if not os.path.isdir(parent):
             os.mkdir(parent)
 
