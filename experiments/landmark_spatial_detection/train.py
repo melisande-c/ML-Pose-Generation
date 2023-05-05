@@ -80,6 +80,8 @@ def main():
     for parent in args.save_dir.parents[::-1]:
         if not os.path.isdir(parent):
             os.mkdir(parent)
+    if not os.path.isdir(args.save_dir):
+        os.mkdir(args.save_dir)
 
     logger.info("Getting model")
     vgg = torch.hub.load("pytorch/vision:v0.10.0", "vgg11", pretrained=True)
