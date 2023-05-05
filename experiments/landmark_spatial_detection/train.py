@@ -90,7 +90,7 @@ def main():
 
     logger.info("Initialising objects")
     dataset = FrameKeyPointDataset(
-        args.dataset_path, transforms=[Rescale(512), RandomSquareCrop(512)]
+        args.dataset_path, transforms=[Rescale(224), RandomSquareCrop(224)]
     )
     optimiser = Adam(model.parameters(), lr=args.learning_rate)
     loss = nn.L1Loss()
