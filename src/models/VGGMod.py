@@ -13,6 +13,7 @@ class VGGMod(nn.Module):
             OrderedDict(
                 [
                     ("fc", nn.Linear(in_features, (64**2) * n_features)),
+                    ("reshape", nn.Unflatten(1, (64, 64, n_features))),
                     ("upsample", nn.Upsample((dim, dim))),
                 ]
             )
