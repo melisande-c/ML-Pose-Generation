@@ -1,4 +1,5 @@
 import sys
+import os
 from pathlib import Path
 import argparse
 
@@ -65,6 +66,11 @@ def main():
     )
     args = parser.parse_args()
 
+    args.save_dir = Path(args.save_dir)
+    for parent in args.savedir.parents[::-1]:
+        if not os.path.isdir(parent):
+            os.mkdir(parent)
+
     print("Getting model")
     vgg = torch.hub.load("pytorch/vision:v0.10.0", "vgg11", pretrained=True)
     print("Customising model")
@@ -77,7 +83,7 @@ def main():
     optimiser = Adam(model.parameters(), lr=args.learning_rate)
     loss = nn.L1Loss()
 
-    logger = PandasPerformanceLogger(Path(args.save_dir) / "performance.csv")
+    logger = PandasPerformanceLogger(args.save_dir / "performance.csv")
 
     print("Beggining training")
     trainer = VGGTrainer(
