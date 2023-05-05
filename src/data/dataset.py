@@ -108,7 +108,7 @@ class Rescale:
         ratio = self.size / img.size[axis]
 
         new_size = [int(img.size[1] * ratio), int(img.size[0] * ratio)]
-        new_size[axis] = self.size
+        new_size[abs(axis - 1)] = self.size
         new_size = tuple(new_size)
         img = transforms.Resize(new_size)(img)
 
