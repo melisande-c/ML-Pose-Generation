@@ -17,6 +17,11 @@ from src.utils.PerformanceLogger import PandasPerformanceLogger
 
 
 class VGGTrainer(ModelTrainer):
+
+    """
+    VGG trainer subclass of model trainer
+    """
+
     # define how input sample to model
     def output(self, sample):
         return self.model(sample["img"].to(self.device))
@@ -27,6 +32,12 @@ class VGGTrainer(ModelTrainer):
 
 
 class EuclideanDistanceLoss(nn.Module):
+
+    """
+    Calculates the mean euclidean distance between the predicted keypoints and
+    the target keypoints.
+    """
+
     def __init__(self) -> None:
         super().__init__()
 
@@ -36,6 +47,7 @@ class EuclideanDistanceLoss(nn.Module):
         return torch.mean(dist)
 
 
+# info logger
 logger = logging.getLogger(
     logging.basicConfig(
         format="%(asctime)-10s  %(name)-40s  %(levelname)-8s: %(message)s",
@@ -87,6 +99,7 @@ def main():
     )
     args = parser.parse_args()
 
+    # make output dir
     args.save_dir = Path(args.save_dir)
     for parent in args.save_dir.parents[::-1]:
         if not os.path.isdir(parent):
@@ -101,7 +114,9 @@ def main():
 
     logger.info("Initialising objects")
     dataset = CoordKeyPointsPA(
-        args.dataset_path, transforms=[Rescale(224), RandomSquareCrop(224)]
+        # rescale and crop data to VGG expected input (224, 224)
+        args.dataset_path,
+        transforms=[Rescale(224), RandomSquareCrop(224)],
     )
     optimiser = Adam(model.parameters(), lr=args.learning_rate)
     loss = EuclideanDistanceLoss()
@@ -110,7 +125,7 @@ def main():
         args.save_dir / "performance.csv"
     )
 
-    logger.info("Beggining training")
+    logger.info("Beginning training")
     trainer = VGGTrainer(
         model,
         dataset,
@@ -122,6 +137,7 @@ def main():
         logger=performance_logger,
     )
 
+    # train model
     trainer.run(args.epochs)
 
 
