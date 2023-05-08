@@ -105,8 +105,8 @@ class CoordKeyPointsPA(PennActionABC):
         img = torch.from_numpy(img)
 
         size = img.shape[1]
-        y = (img / size - 0.5).astype(np.float32)
-        x = (img / size - (x / y) / 2).astype(np.float32)
+        y = (y / size - 0.5).astype(np.float32)
+        x = (x / size - (img.shape[0] / size) / 2).astype(np.float32)
 
         labels = np.stack([x, y], axis=1)
         labels = torch.from_numpy(labels)
