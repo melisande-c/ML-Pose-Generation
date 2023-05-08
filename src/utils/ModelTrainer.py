@@ -93,15 +93,15 @@ class ModelTrainer(ABC):
             info_logger.info(f"--- Epoch {self.epoch}")
             self.train()
             self.logger.log_performance(
-                epoch, "train", self.train_loss.item(), None
+                self.epoch, "train", self.train_loss.item(), None
             )
             self.test()
             self.logger.log_performance(
-                epoch, "test", self.test_loss.item(), None
+                self.epoch, "test", self.test_loss.item(), None
             )
             torch.save(
                 {
-                    "epoch": epoch,
+                    "epoch": self.epoch,
                     "model_state_dict": self.model.state_dict(),
                     "optimizer_state_dict": self.optimiser.state_dict(),
                     "loss": self.train_loss,
