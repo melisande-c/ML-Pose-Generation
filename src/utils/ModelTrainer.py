@@ -6,9 +6,10 @@ from typing import TYPE_CHECKING, Optional
 import logging
 import torch
 from torch import nn
-from torch.utils.data import DataLoader, Dataset, random_split
+from torch.utils.data import DataLoader, Dataset
 from torch.optim import Optimizer
 from .PerformanceLogger import PerformanceLogger
+from ..data.train_test_split import train_test_split
 
 if TYPE_CHECKING:
     Loss = nn.modules.loss._Loss
@@ -35,8 +36,8 @@ class ModelTrainer(ABC):
         self.model = model
         self.model.to(self.device)
         self.dataset = dataset
-        self.dataset_train, self.dataset_test = random_split(
-            dataset, [train_fraction, 1 - train_fraction]
+        self.dataset_train, self.dataset_test = train_test_split(
+            dataset, train_fraction
         )
         self.dataloader_train = DataLoader(
             self.dataset_train, batch_size, shuffle=True
