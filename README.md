@@ -1,11 +1,40 @@
 # ML-Pose-Generation
 
+A repository for multiple ML experiments involving pose detection and generation using the [PennAction](http://dreamdragon.github.io/PennAction/) dataset.
 
-**Dataset**
-@inproceedings{vonMarcard2018,
-    title = {Recovering Accurate 3D Human Pose in The Wild Using IMUs and a Moving Camera},
-    author = {von Marcard, Timo and Henschel, Roberto and Black, Michael and Rosenhahn, Bodo and Pons-Moll, Gerard},
-    booktitle = {European Conference on Computer Vision (ECCV)},
-    year = {2018},
-    month = {sep}
-    }
+PennAction Reference: *Weiyu Zhang, Menglong Zhu and Konstantinos Derpanis,  "From
+Actemes to Action: A Strongly-supervised Representation for
+Detailed Action Understanding" International Conference on
+Computer Vision (ICCV). Dec 2013.*
+
+Currently, the two experiments use a modified version of the pretrained VGG architecture from the paper [Very Deep Converlutional Networks for Large Scale Image Recognition](https://arxiv.org/pdf/1409.1556.pdf).
+
+VGG Reference: *Simonyan, K. and Zisserman, A., 2014. Very deep convolutional networks for large-scale image recognition. arXiv preprint arXiv:1409.1556.*
+
+## Running on Google Colab
+
+```
+# Download the dataset
+!wget "https://www.cis.upenn.edu/~kostas/Penn_Action.tar.gz"
+
+# Unzip the dataset
+!tar -xf "Penn_Action.tar.gz"
+
+# Clone the repository
+!git clone "https://github.com/melisande-c/ML-Pose-Generation.git"
+
+# Run the chosen experiment with the desired settings
+!python "/content/ML-Pose-Generation/experiments/landmark_spatial_detection/train.py" \
+  -dsp "/content/Penn_Action" \
+  -sd "/content/Outputs/landmark_regression_detection" \
+  -e 10 \
+  -bs 64 \
+  -tf 0.5
+```
+
+## Repository
+
+* [src](src): Code base for models, datasets and other various utilities.
+* [experiments](experiments): Training scripts for various experiments.
+
+The src code includes a generic [model trainer](src/utils/ModelTrainer.py) to ensure consistent training and logging of training metadata between experiments; a custom [dataset class](src/data/datasets.py) for loading the PennAction dataset; and [classes](src/models/VGGMod.py) to adapt VGG to these specific use cases.
