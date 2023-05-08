@@ -2,6 +2,9 @@ from torch.utils.data import Subset
 import numpy as np
 from .datasets import PennActionABC
 
+# for repeatablility
+np.random.seed(42)
+
 
 def train_test_split(dataset: PennActionABC, train_fraction):
     n = len(dataset.cumulative_frames) - 1
