@@ -9,6 +9,9 @@
 # mac files
 .DS_Store
 
+# vscode files
+.vscode
+
 # User-specific files
 *.rsuser
 *.suo
