@@ -7,7 +7,25 @@ def make_gaussian(
     shape: Tuple[int, int],
     fwhm: float = 16,
     center: Optional[Tuple[int, int]] = None,
-):
+) -> NDArray[np.float_]:
+    """
+    Creates a 2D gausian.
+
+    Parameters
+    ----------
+    shape: (int, int)
+        Output array shape
+    fwhm: float
+        The full width at half maximum of the distribution
+    center: (int, int), optional
+        The center of the distribution, if None, it will default to the center
+        of the array
+
+    Returns
+    -------
+    gaussian_image: numpy.ndarray
+
+    """
     i, j = np.mgrid[: shape[0], : shape[1]]
 
     if center is None:
@@ -26,6 +44,21 @@ def key_points_image(
     key_points_y: NDArray,
     fwhm: float = 16,
 ):
+    """
+    Creates a channel for each key point and creates a gaussian with the center
+    at the key point
+
+    Parameters
+    ----------
+    shape: (int, int)
+        The 2D shape of the image.
+    key_points_x: numpy.ndarray
+        The x coordinates of the key points.
+    key_points_y: numpy.ndarray
+        The y coordinates of the key points.
+    fwhm: float
+        The full width at half maximum of the distrubutions.
+    """
     output = np.zeros((*shape, key_points_x.shape[0]))
     for i, (x, y) in enumerate(zip(key_points_x, key_points_y)):
         output[..., i] = make_gaussian(shape, fwhm, (y, x))
