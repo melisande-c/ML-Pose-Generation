@@ -30,6 +30,8 @@ class PandasPerformanceLogger(PerformanceLogger):
         super().__init__(filename, name)
         if self.filename.suffix != ".csv":
             self.df_filename = self.df_filename.with_suffix(".csv")
+        else:
+            self.df_filename = filename
 
         self.data = {"epoch": [], "mode": [], "loss": [], "accuracy": []}
 
