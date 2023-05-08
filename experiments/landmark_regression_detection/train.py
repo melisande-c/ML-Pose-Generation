@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).parents[2]))
 import torch
 from torch import nn
 from torch.optim import Adam
-from src.models.VGGMod import VGGSpatialMod
+from src.models.VGGMod import VGGCoordMod
 from src.data.datasets import SpatialKeyPointsPA
 from src.data.transforms import Rescale, RandomSquareCrop
 from src.utils.ModelTrainer import ModelTrainer
@@ -24,6 +24,16 @@ class VGGTrainer(ModelTrainer):
     # define how to calculate loss
     def calc_loss(self, output, sample) -> torch.Tensor:
         return self.loss(output, sample["labels"].to(self.device))
+
+
+class EuclideanDistanceLoss(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def forward(self, output, target):
+        pdist = nn.PairwiseDistance(p=2)
+        dist = pdist(output, target)
+        return torch.mean(dist)
 
 
 logger = logging.getLogger(
@@ -87,14 +97,14 @@ def main():
     logger.info("Getting model")
     vgg = torch.hub.load("pytorch/vision:v0.10.0", "vgg11", pretrained=True)
     logger.info("Customising model")
-    model = VGGSpatialMod(vgg, 224, 13)
+    model = VGGCoordMod(vgg, 13)
 
     logger.info("Initialising objects")
     dataset = SpatialKeyPointsPA(
         args.dataset_path, transforms=[Rescale(224), RandomSquareCrop(224)]
     )
     optimiser = Adam(model.parameters(), lr=args.learning_rate)
-    loss = nn.L1Loss()
+    loss = EuclideanDistanceLoss()
 
     performance_logger = PandasPerformanceLogger(
         args.save_dir / "performance.csv"

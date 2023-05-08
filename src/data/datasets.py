@@ -1,15 +1,16 @@
 import os
+from abc import ABC, abstractmethod
 from pathlib import Path
 from PIL import Image
 import numpy as np
 from scipy.io import loadmat
 import torch
-from torchvision import transforms
+
 from torch.utils.data import Dataset
 from .keypoints_transform import key_points_image
 
 
-class FrameKeyPointDataset(Dataset):
+class PennActionABC(Dataset, ABC):
     def __init__(self, root_dir: os.PathLike, transforms=None):
         self.transforms = transforms
 
@@ -36,28 +37,38 @@ class FrameKeyPointDataset(Dataset):
     def __len__(self):
         return self.cumulative_frames[-1]
 
+    @abstractmethod
     def __getitem__(self, index):
+        ...
+
+    def get_frame_data(self, index: int):
         clip = np.digitize(index, self.cumulative_frames)
         self.current_frame_info["clip"] = clip
-
-        clip_dir = self.root_dir / "frames" / f"{clip:04d}"
-
-        label_path = self.root_dir / "labels" / f"{clip:04d}.mat"
-        labels = loadmat(str(label_path))
 
         frame = index - self.cumulative_frames[clip - 1] + 1
         self.current_frame_info["frame"] = frame
 
-        frame_data = self._get_frame(clip_dir, labels, frame)
+        return clip, frame
 
-        return frame_data
-
-    def _get_frame(self, clip_dir, labels, frame):
-        frame_path = clip_dir / f"{frame:06d}.jpg"
-        img = Image.open(frame_path)
-
+    def get_labels(self, clip: int, frame: int):
+        label_path = self.root_dir / "labels" / f"{clip:04d}.mat"
+        labels = loadmat(str(label_path))
         x = labels["x"][frame - 1]
         y = labels["y"][frame - 1]
+        return x, y
+
+    def get_frame(self, clip: int, frame: int):
+        clip_dir = self.root_dir / "frames" / f"{clip:04d}"
+        frame_path = clip_dir / f"{frame:06d}.jpg"
+        img = Image.open(frame_path)
+        return img
+
+
+class SpatialKeyPointsPA(PennActionABC):
+    def __getitem__(self, index):
+        clip, frame = self.get_frame_data(index)
+        img = self.get_frame(clip, frame)
+        x, y = self.get_labels(clip, frame)
 
         if self.transforms is not None:
             for transform in self.transforms:
@@ -77,7 +88,33 @@ class FrameKeyPointDataset(Dataset):
         return {"img": img, "labels": keypoint_img}
 
 
-class DoubleFrameKeyPointDataset(FrameKeyPointDataset):
+class CoordKeyPointsPA(PennActionABC):
+    def __getitem__(self, index):
+        clip, frame = self.get_frame_data(index)
+        img = self.get_frame(clip, frame)
+        x, y = self.get_labels(clip, frame)
+
+        if self.transforms is not None:
+            for transform in self.transforms:
+                img, x, y = transform(img, x, y)
+
+        img = np.array(img)
+        img = np.rollaxis(img, 2)
+        img = img / 255
+        img = img.astype(np.float32)
+        img = torch.from_numpy(img)
+
+        size = img.shape[1]
+        y = (img / size - 0.5).astype(np.float32)
+        x = (img / size - (x / y) / 2).astype(np.float32)
+
+        labels = np.stack([x, y], axis=1)
+        labels = torch.from_numpy(labels)
+
+        return {"img": img, "labels": labels}
+
+
+class DoubleSpatialKeypointsPA(SpatialKeyPointsPA):
     def __getitem__(self, index):
         frame_data_1 = super().__getitem__(index)
 
@@ -97,47 +134,3 @@ class DoubleFrameKeyPointDataset(FrameKeyPointDataset):
             "labels1": frame_data_1["labels"],
             "labels2": frame_data_2["labels"],
         }
-
-
-class Rescale:
-    def __init__(self, size: int):
-        self.size = size
-
-    def __call__(self, img, x, y):
-        axis = np.argmin(img.size)
-        ratio = self.size / img.size[axis]
-
-        new_size = [int(img.size[1] * ratio), int(img.size[0] * ratio)]
-        new_size[abs(axis - 1)] = self.size
-        new_size = tuple(new_size)
-        img = transforms.Resize(new_size)(img)
-
-        x = x * ratio
-        y = y * ratio
-        return img, x, y
-
-
-class RandomSquareCrop:
-    def __init__(self, size: int):
-        self.size = size
-
-    def __call__(self, img, x, y):
-        idiff = max(0, img.size[1] - self.size - 1)
-        jdiff = max(0, img.size[0] - self.size - 1)
-
-        if idiff != 0:
-            i = np.random.randint(0, idiff)
-        else:
-            i = 0
-        if jdiff != 0:
-            j = np.random.randint(0, jdiff)
-        else:
-            j = 0
-
-        img = np.array(img)[i : i + self.size, j : j + self.size]
-        img = Image.fromarray(img)
-
-        x = x - j
-        y = y - i
-
-        return img, x, y
