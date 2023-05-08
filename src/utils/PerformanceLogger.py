@@ -6,6 +6,10 @@ import pandas as pd
 
 
 class PerformanceLogger:
+    """
+    Logger that outputs performance to the console.
+    """
+
     def __init__(self, filename: os.PathLike, name: Optional[str] = None):
         self.filename = Path(filename)
         if name is not None:
@@ -26,6 +30,12 @@ class PerformanceLogger:
 
 
 class PandasPerformanceLogger(PerformanceLogger):
+
+    """
+    Logger that outputs performance to the console and saves the data as a
+    csv file.
+    """
+
     def __init__(self, filename: os.PathLike, name: Optional[str] = None):
         super().__init__(filename, name)
         if self.filename.suffix != ".csv":
