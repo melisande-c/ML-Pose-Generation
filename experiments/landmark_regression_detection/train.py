@@ -10,7 +10,7 @@ import torch
 from torch import nn
 from torch.optim import Adam
 from src.models.VGGMod import VGGCoordMod
-from src.data.datasets import SpatialKeyPointsPA
+from src.data.datasets import CoordKeyPointsPA
 from src.data.transforms import Rescale, RandomSquareCrop
 from src.utils.ModelTrainer import ModelTrainer
 from src.utils.PerformanceLogger import PandasPerformanceLogger
@@ -100,7 +100,7 @@ def main():
     model = VGGCoordMod(vgg, 13)
 
     logger.info("Initialising objects")
-    dataset = SpatialKeyPointsPA(
+    dataset = CoordKeyPointsPA(
         args.dataset_path, transforms=[Rescale(224), RandomSquareCrop(224)]
     )
     optimiser = Adam(model.parameters(), lr=args.learning_rate)
