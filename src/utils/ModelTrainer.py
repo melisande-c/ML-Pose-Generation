@@ -71,9 +71,9 @@ class ModelTrainer(ABC):
         for i, sample in enumerate(self.dataloader_train):
             output = self.output(sample)
             loss = self.calc_loss(output, sample)
-            running_loss += loss
             loss.backward()
             self.optimiser.step()
+            running_loss += loss.detach()
         self.train_loss = running_loss / i
 
     def test(self):
@@ -83,7 +83,7 @@ class ModelTrainer(ABC):
             for i, sample in enumerate(self.dataloader_train):
                 output = self.output(sample)
                 loss = self.calc_loss(output, sample)
-                running_loss += loss
+                running_loss += loss.detach()
             self.test_loss = running_loss / i
 
     def run(self, epochs: int):
