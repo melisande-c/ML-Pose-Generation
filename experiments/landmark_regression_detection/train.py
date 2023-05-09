@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import argparse
 import logging
+from typing import Literal
 
 sys.path.insert(0, str(Path(__file__).parents[2]))
 
@@ -38,13 +39,23 @@ class EuclideanDistanceLoss(nn.Module):
     the target keypoints.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, reduction=Literal["sum", "mean", "none"]) -> None:
         super().__init__()
+        self.reduction = reduction
 
     def forward(self, output, target):
         pdist = nn.PairwiseDistance(p=2)
         dist = pdist(output, target)
-        return torch.mean(dist)
+        if self.reduction == "mean":
+            return torch.mean(dist)
+        elif self.reduction == "sum":
+            return torch.sum(dist)
+        elif self.reduction == "none":
+            return dist
+        else:
+            raise ValueError(
+                f"Reduction value, '{self.reduction}' not accepted."
+            )
 
 
 # info logger
@@ -119,7 +130,7 @@ def main():
         transforms=[Rescale(224), RandomSquareCrop(224)],
     )
     optimiser = Adam(model.parameters(), lr=args.learning_rate)
-    loss = EuclideanDistanceLoss()
+    loss = EuclideanDistanceLoss(reduction="sum")
 
     performance_logger = PandasPerformanceLogger(
         args.save_dir / "performance.csv"
