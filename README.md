@@ -1,6 +1,6 @@
 # ML-Pose-Generation
 
-A repository for multiple ML experiments involving pose detection and generation using the [PennAction](http://dreamdragon.github.io/PennAction/) dataset.
+A repository for multiple ML experiments involving pose detection and generation using the [PennAction](http://dreamdragon.github.io/PennAction/) dataset. The PennAction data set has multiple clips with each frame saved as a jpeg and arrays of keypoint coordinates for the head, shoulders, elbows, hands, hips, knees and feet.
 
 PennAction Reference: *Weiyu Zhang, Menglong Zhu and Konstantinos Derpanis,  "From
 Actemes to Action: A Strongly-supervised Representation for
