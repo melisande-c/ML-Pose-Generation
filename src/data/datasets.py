@@ -196,17 +196,18 @@ class CoordKeyPointsPA(PennActionABC):
             for transform in self.transforms:
                 img, x, y = transform(img, x, y)
 
-        # Convert image to expected format
         img = np.array(img)
-        img = np.rollaxis(img, 2)
-        img = img / 255
-        img = img.astype(np.float32)
-        img = torch.from_numpy(img)
 
         # zero center coordinates and scale by y axis size.
         size = img.shape[1]
         y = (y / size - 0.5).astype(np.float32)
         x = (x / size - (img.shape[0] / size) / 2).astype(np.float32)
+
+        # Convert image to expected format
+        img = np.rollaxis(img, 2)
+        img = img / 255
+        img = img.astype(np.float32)
+        img = torch.from_numpy(img)
 
         labels = np.stack([x, y], axis=1)
         labels = torch.from_numpy(labels)
