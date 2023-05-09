@@ -58,7 +58,11 @@ class ModelTrainer(ABC):
             The logger used for saving & displaying performance during training.
         """
         self.device = torch.device(
-            "cuda" if torch.cuda.is_available() else "cpu"
+            "cuda"
+            if torch.cuda.is_available()
+            else "mps"
+            if torch.backends.mps.is_available()
+            else "cpu"
         )
         info_logger.info(f"Using device: {self.device}")
         self.model = model
