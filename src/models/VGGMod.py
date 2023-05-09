@@ -27,12 +27,13 @@ class VGGCoordMod(nn.Module):
         in_features = self.vgg_model.classifier[-4].out_features
         # replace final layer
         self.vgg_model.classifier[-1] = nn.Linear(in_features, 2 * coords_n)
+        self.reshape = nn.Unflatten(1, (self.coords_n, 2))
 
     def forward(self, x):
         y = self.vgg_model(x)
         # reshape the output so that each row is a key point and the columns
         # are x and y coordinates.
-        return nn.Unflatten(1, (self.coords_n, 2))
+        return self.reshape(y)
 
 
 class VGGSpatialMod(nn.Module):
