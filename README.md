@@ -24,7 +24,7 @@ VGG Reference: *Simonyan, K. and Zisserman, A., 2014. Very deep convolutional ne
 !git clone "https://github.com/melisande-c/ML-Pose-Generation.git"
 
 # Run the chosen experiment with the desired settings
-!python "/content/ML-Pose-Generation/experiments/landmark_spatial_detection/train.py" \
+!python "/content/ML-Pose-Generation/experiments/landmark_regression_detections.py" \
   -dsp "/content/Penn_Action" \
   -sd "/content/Outputs/landmark_regression_detection" \
   -e 10 \
