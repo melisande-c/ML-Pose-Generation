@@ -109,7 +109,7 @@ def main():
         type=float,
     )
     args = parser.parse_args()
-    logger.log(
+    logger.info(
         "\n"
         f"dataset path: {args.dataset_path}\n"
         f"save dir: {args.save_dir}\n"
