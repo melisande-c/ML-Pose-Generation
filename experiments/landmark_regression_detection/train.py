@@ -109,6 +109,15 @@ def main():
         type=float,
     )
     args = parser.parse_args()
+    logger.log(
+        "\n"
+        f"dataset path: {args.dataset_path}\n"
+        f"save dir: {args.save_dir}\n"
+        f"epochs: {args.epochs}\n"
+        f"batch size: {args.batch_size}\n"
+        f"learning rate: {args.learning_rate}\n"
+        f"training_fraction: {args.training_fraction}"
+    )
 
     # make output dir
     args.save_dir = Path(args.save_dir)
