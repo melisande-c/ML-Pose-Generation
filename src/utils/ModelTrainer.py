@@ -120,6 +120,7 @@ class ModelTrainer(ABC):
         self.model.zero_grad()  # reset gradients
         # keep the running loss for the whole epoch
         running_loss = 0
+        n = 0
         for i, sample in enumerate(self.dataloader_train):
             output = self.output(sample)  # get the output from the model
             loss = self.calc_loss(output, sample)  # calculate the loss
@@ -127,7 +128,9 @@ class ModelTrainer(ABC):
             self.optimiser.step()  # optimise
             # detach so the current graph can be garbage collected
             running_loss += loss.detach()
-        self.train_loss = running_loss / i  # divide by i for the mean
+        self.train_loss = running_loss / len(
+            self.dataset_train
+        )  # divide by i for the mean
 
     def test(self):
         self.model.eval()  # evaluation mode
@@ -138,7 +141,7 @@ class ModelTrainer(ABC):
                 output = self.output(sample)
                 loss = self.calc_loss(output, sample)
                 running_loss += loss.detach()
-            self.test_loss = running_loss / i
+            self.test_loss = running_loss / len(self.dataset_test)
 
     def run(self, epochs: int):
         for epoch in range(epochs):
